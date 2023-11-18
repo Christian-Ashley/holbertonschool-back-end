@@ -1,40 +1,37 @@
 #!/usr/bin/python3
-"""returns information about emplopyee todo list progress"""
+""" returns information about to-do list progress """
 import requests
 import sys
 
 
-def gather_data():
-    """gets users and todo lists from api
-    user id is the second argument
-    you can
-    for items in todos
-    """
-    if len(sys.argv) != 2:
-        return  # code only works if we got a user id
-    id = sys.argv[1]  # user gives id number in request.
-    # argv[0] is funciton name
-    user = requests.get('https://jsonplaceholder.typicode.com/users/{}'
-                        .format(id)).json()
-    # This is one user's data. it's user with the requested id
-    todos = requests.get('https://jsonplaceholder.typicode.com/todos',
-                         params={"userId": id}).json()
-    # get requests where the conditions in params are met
-    # traveling to the url, todos is an array [] of dictionaries {}
-    user_name = user.get("name")
-    tasks_done = 0
-    tasks_titles = []
-    tasks_total = 0
-    for task in todos:
-        tasks_total += 1
-        if task['completed'] is True:
-            tasks_done += 1
-            tasks_titles.append(task['title'])
-    print('Employee ' + user_name + ' is done with tasks(' +
-          str(tasks_done) + '/' + str(tasks_total) + '):')
-    for taskname in tasks_titles:
-        print('\t ' + taskname)
+def gather_api_data():
+    """gather and print api data"""
+    if(len(sys.argv) != 2):
+        print("Error not 3 commands")
+
+    employee_id = sys.argv[1]
+
+    user_data = requests.get('https://jsonplaceholder.typicode.com/users/{}'
+                             .format(employee_id)).json()
+    todo_data = requests.get('https://jsonplaceholder.typicode.com/todos',
+                             params={"userId": employee_id}).json()
+    EMPLOYEE_NAME = user_data.get("name")
+    NUMBER_OF_DONE_TASKS = 0
+    TOTAL_NUMBER_OF_TASKS = 0
+
+    completed_tasks = []
+
+    for item in todo_data:
+        TOTAL_NUMBER_OF_TASKS += 1
+        if item.get("completed"):
+            NUMBER_OF_DONE_TASKS += 1
+            completed_tasks.append(item.get("title"))
+
+    print('Employee {} is done with tasks({}/{}):'
+          .format(EMPLOYEE_NAME, NUMBER_OF_DONE_TASKS, TOTAL_NUMBER_OF_TASKS))
+    for task in completed_tasks:
+        print("\t {}".format(task))
 
 
-if __name__ == '__main__':
-    gather_data()
+if __name__ == "__main__":
+    gather_api_data()
